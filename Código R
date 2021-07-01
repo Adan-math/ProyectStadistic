@@ -1,0 +1,102 @@
+#Leemos los datos
+library(readr)
+library(modeest)
+library(psych)
+library(prodlim)
+library(Publish)
+library(ggplot2)
+#Guardamos los datos en 
+Data <- read_csv("ObesityDataSet_raw_and_data_sinthetic.csv")
+#Denotamos los parametros Peso, Edad y Altura como X, Y y Z respectivamente
+X=Data$Weight
+Y=Data$Age
+Z=Data$Height
+#Caracteristicas de las muestras
+#Medidas de tendencia central
+Media_X=mean(X, na.rm = TRUE)
+Media_Y=mean(Y, na.rm = TRUE)
+Media_Z=mean(Z, na.rm = TRUE)
+Mediana_X=median(X, na.rm = TRUE)
+Mediana_Y=median(Y, na.rm = TRUE)
+Mediana_Z=median(Z, na.rm = TRUE)
+Moda_X=mfv(X)
+Moda_Y=mfv(Y)
+Moda_Z=mfv(Z)
+#Frecuencias absolutas
+tabla_X <- table(X)
+tabla_Y <- table(Y)
+tabla_Z <- table(Z)
+#Frecuencias absolutas acumuladas
+AcumTabla_X=cumsum(tabla_X)
+AcumTabla_Y=cumsum(tabla_Y)
+AcumTabla_Z=cumsum(tabla_Z)
+#Frecuencias relativas
+Proptabla_X=prop.table(tabla_X)
+Proptabla_Y=prop.table(tabla_Y)
+Proptabla_Z=prop.table(tabla_Z)
+#Frecuencias relativas acumuladas
+AcumProptabla_X=cumsum(prop.table(tabla_X))
+AcumProptabla_Y=cumsum(prop.table(tabla_Y))
+AcumProptabla_Z=cumsum(prop.table(tabla_Z))
+#Quantiles
+Quantil_X=quantile(X, prob = c(0.25, 0.5, 0.75), na.rm = TRUE)
+Quantil_Y=quantile(Y, prob = c(0.25, 0.5, 0.75), na.rm = TRUE)
+Quantil_Z=quantile(Z, prob = c(0.25, 0.5, 0.75), na.rm = TRUE)
+#Medidas de dispercion
+#Rango
+Rango_X=range(X, na.rm = TRUE)
+Rango_Y=range(Y, na.rm = TRUE)
+Rango_Z=range(Z, na.rm = TRUE)
+#Varianza
+Var_X=var(X, na.rm = TRUE)
+Var_Y=var(Y, na.rm = TRUE)
+Var_Z=var(Z, na.rm = TRUE)
+#Desviacion Estandar
+Des_X=sd(X, na.rm = TRUE)
+Des_Y=sd(Y, na.rm = TRUE)
+Des_Z=sd(Z, na.rm = TRUE)
+#Coeficientes de variacion
+CV_X=Des_X/Media_X
+CV_Y=Des_Y/Media_Y
+CV_Z=Des_Z/Media_Z
+#Coeficientes de simetria
+CoefS_X=skew(X)
+CoefS_Y=skew(Y)
+CoefS_Z=skew(Z)
+#Coeficientes de curtosis
+CoefC_X=kurtosi(X)
+CoefC_Y=kurtosi(Y)
+CoefC_Z=kurtosi(Z)
+#Test de muestra normal
+Test_X=ks.test(X, "pnorm", Media_X, Des_X)
+Test_Y=ks.test(Y, "pnorm", Media_Y, Des_Y)
+Test_Z=ks.test(Z, "pnorm", Media_Z, Des_Z)
+#Intervalos de confianza para la media con un nivel de significancia del 0.05
+IntMedia_X=ci.mean(X, alpha = 0.05)
+IntMedia_Y=ci.mean(Y, alpha = 0.05)
+IntMedia_Z=ci.mean(Z, alpha = 0.05)
+#Histogramas
+hist(X, main = "Histograma de Peso",xlab = "Peso", ylab = "Frecuencia", col = "red")
+hist(Y, main = "Histograma de Edad",xlab = "Edad", ylab = "Frecuencia", col = "blue")
+hist(Z, main = "Histograma de Altura",xlab = "Altura", ylab = "Frecuencia", col = "purple")
+#Regresion lineal
+modelo1=lm(Weight~Age,data=Data,na.action = na.exclude)
+modelo2=lm(Weight~Height,data=Data,na.action = na.exclude)
+summary(modelo1)
+summary(modelo2)
+grafica1=ggplot(Data,aes(Weight,Age))
+grafica1+geom_point()+geom_smooth(method = "lm",colour="red")
+grafica2=ggplot(Data,aes(Weight,Height))
+grafica2+geom_point()+geom_smooth(method = "lm",colour="blue")
+#Regresion segunda parte
+n=length(X)
+term1=X-c(rep(Media_X,n))
+term2=Y-c(rep(Media_Y,n))
+term3=Z-c(rep(Media_Z,n))
+B_1=(t(term1)%*%term2)/(t(term2)%*%term2)
+B_0=Media_X-(B_1*Media_Y)
+B_1_=(t(term1)%*%term3)/(t(term3)%*%term3)
+B_0_=Media_X-(B_1_*Media_Z)
+
+
+
